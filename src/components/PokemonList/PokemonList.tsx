@@ -3,6 +3,7 @@ import { Pokemon } from "../../models/Pokemon"
 import PokemonBox from "../PokemonBox/PokemonBox"
 import axios from "axios"
 import { PokemonAPI } from "../../models/PokemonAPI"
+
 export default function PokemonList() {
 
     const newPokemon:Pokemon = {
@@ -35,10 +36,6 @@ export default function PokemonList() {
         event.preventDefault();
         console.log(listOfPokemons);
     
-        //When you click on the button to submit
-        //Send request using Axios 
-        //Axios is going to grab the information from the pokeAPI and store it
-        
         axios.get<PokemonAPI>(`https://pokeapi.co/api/v2/pokemon/${newPokemon.name}`)
         .then(response => {
             console.log(response.data);
@@ -56,8 +53,12 @@ export default function PokemonList() {
       }
 
       function setNameP(event: React.ChangeEvent<HTMLInputElement>){
-        
         newPokemon.name = event.target.value;
+      }
+
+      function removePokemon(poke: Pokemon){
+        const newListOfPokemons = listOfPokemons.filter(pokemon => pokemon !== poke);
+        setListPoke(newListOfPokemons);
       }
 
     return  (
@@ -70,12 +71,20 @@ export default function PokemonList() {
             <input type="submit"></input>
         </form>
 
-
         <h2>Pokemon List</h2>
         <div className="grid-pokemon">
             {
                 listOfPokemons.map(poke => {
-                    return <PokemonBox key={poke.name} {...poke} />
+                   return (
+                    <PokemonBox
+                      key={poke.name}
+                      {...poke}
+                      onDelete={() => {
+                        const filteredList = listOfPokemons.filter(p => p !== poke);
+                        setListPoke(filteredList);
+                      }}
+                    />
+                  );
                 })
             }
         </div>
